@@ -101,12 +101,16 @@ static void trigger_morse_time_vibration() {
     vibes_enqueue_custom_pattern(vibe_pattern);
 }
 
-static void prv_select_click_handler(ClickRecognizerRef recognizer, void *context) {
+static void long_click_down_handler(ClickRecognizerRef recognizer, void *context) {
+  // Called when the button is held down for the specified delay.
   trigger_morse_time_vibration();
 }
 
 static void prv_click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_SELECT, prv_select_click_handler);
+  // long click config
+  window_long_click_subscribe(BUTTON_ID_SELECT, 0, long_click_down_handler, NULL);
+  window_long_click_subscribe(BUTTON_ID_UP, 0, long_click_down_handler, NULL);
+  window_long_click_subscribe(BUTTON_ID_DOWN, 0, long_click_down_handler, NULL);
 }
 
 static void update_time() {
