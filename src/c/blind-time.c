@@ -4,8 +4,8 @@
 // Morse definitions
 #define MORSE_DOT_DURATION 100
 #define MORSE_DASH_DURATION 300
-#define MORSE_GAP_DURATION 100
-#define MORSE_DIGIT_GAP_DURATION 500
+#define MORSE_GAP_DURATION 150
+#define MORSE_DIGIT_GAP_DURATION 1000
 
 // Morse patterns for 0-9
 static const char* morse_digits[] = {
