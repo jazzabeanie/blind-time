@@ -1,3 +1,6 @@
+# Blind-time
+
+An app to tell the time without you need to open your eyes.
 
 ## Building and testing
 
