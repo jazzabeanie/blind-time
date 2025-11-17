@@ -177,6 +177,9 @@ static void init() {
   // Make sure the time is displayed from the start
   update_time();
 
+  // Trigger Morse code vibration on launch
+  trigger_morse_time_vibration();
+
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
 }
