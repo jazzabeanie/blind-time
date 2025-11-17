@@ -83,6 +83,21 @@ static void trigger_morse_time_vibration() {
     vibe_pattern.durations = vibe_segments;
     vibe_pattern.num_segments = segment_index;
 
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Vibrating time in Morse code.");
+    static char s_pattern_buffer[512];
+    int offset = snprintf(s_pattern_buffer, sizeof(s_pattern_buffer), "Pattern: ");
+    for(uint32_t i = 0; i < vibe_pattern.num_segments; i++) {
+      offset += snprintf(s_pattern_buffer + offset, sizeof(s_pattern_buffer) - offset, "%lu ", (unsigned long)vibe_segments[i]);
+      if (offset >= (int)sizeof(s_pattern_buffer)) {
+        // Buffer is full, log what we have and stop.
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "%s...", s_pattern_buffer);
+        break;
+      }
+    }
+    if (offset < (int)sizeof(s_pattern_buffer)) {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", s_pattern_buffer);
+    }
+
     vibes_enqueue_custom_pattern(vibe_pattern);
 }
 
