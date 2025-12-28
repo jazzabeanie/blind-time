@@ -7,6 +7,8 @@
 #define MORSE_GAP_DURATION 150
 #define MORSE_DIGIT_GAP_DURATION 1000
 
+#define TIMEOUT_MS 30000
+
 // Morse patterns for 0-9
 static const char* morse_digits[] = {
   "-----", // 0
@@ -24,6 +26,8 @@ static const char* morse_digits[] = {
 static Window *s_main_window;
 static TextLayer *s_time_layer;
 
+static AppTimer *s_timeout_timer;
+
 static VibePattern vibe_pattern;
 static uint32_t vibe_segments[64];
 
@@ -39,6 +43,17 @@ static void queue_vibration_for_digit(int digit, uint32_t *segment_index) {
         }
         vibe_segments[(*segment_index)++] = MORSE_GAP_DURATION;
     }
+}
+
+static void timeout_callback(void *data) {
+  window_stack_pop_all(true);
+}
+
+static void reset_timeout_timer() {
+  if (s_timeout_timer) {
+    app_timer_cancel(s_timeout_timer);
+  }
+  s_timeout_timer = app_timer_register(TIMEOUT_MS, timeout_callback, NULL);
 }
 
 static void trigger_morse_time_vibration() {
@@ -103,7 +118,12 @@ static void trigger_morse_time_vibration() {
 
 static void long_click_down_handler(ClickRecognizerRef recognizer, void *context) {
   // Called when the button is held down for the specified delay.
+  reset_timeout_timer();
   trigger_morse_time_vibration();
+}
+
+static void any_click_handler(ClickRecognizerRef recognizer, void *context) {
+  reset_timeout_timer();
 }
 
 static void prv_click_config_provider(void *context) {
@@ -111,6 +131,11 @@ static void prv_click_config_provider(void *context) {
   window_long_click_subscribe(BUTTON_ID_SELECT, 0, long_click_down_handler, NULL);
   window_long_click_subscribe(BUTTON_ID_UP, 0, long_click_down_handler, NULL);
   window_long_click_subscribe(BUTTON_ID_DOWN, 0, long_click_down_handler, NULL);
+
+  // single click config to catch any activity
+  window_single_click_subscribe(BUTTON_ID_SELECT, any_click_handler);
+  window_single_click_subscribe(BUTTON_ID_UP, any_click_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, any_click_handler);
 }
 
 static void update_time() {
@@ -180,11 +205,16 @@ static void init() {
   // Trigger Morse code vibration on launch
   trigger_morse_time_vibration();
 
+  reset_timeout_timer();
+
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
 }
 
 static void deinit() {
+  if (s_timeout_timer) {
+    app_timer_cancel(s_timeout_timer);
+  }
   // Destroy Window
   window_destroy(s_main_window);
 }
