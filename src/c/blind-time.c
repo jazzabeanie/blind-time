@@ -46,10 +46,13 @@ static void queue_vibration_for_digit(int digit, uint32_t *segment_index) {
 }
 
 static void timeout_callback(void *data) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Timeout reached. Exiting.");
+  s_timeout_timer = NULL;
   window_stack_pop_all(true);
 }
 
 static void reset_timeout_timer() {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Resetting timeout timer.");
   if (s_timeout_timer) {
     app_timer_cancel(s_timeout_timer);
   }
