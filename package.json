@@ -9,7 +9,7 @@
     "displayName": "blind-time",
     "uuid": "0d7a13a3-e42f-40da-bed3-1aa78931eff3",
     "sdkVersion": "3",
-    "enableMultiJS": true,
+    "enableMultiJS": false,
     "targetPlatforms": [
       "aplite",
       "basalt",
@@ -21,9 +21,6 @@
     "watchapp": {
       "watchface": false
     },
-    "messageKeys": [
-      "dummy"
-    ],
     "resources": {
       "media": []
     }
