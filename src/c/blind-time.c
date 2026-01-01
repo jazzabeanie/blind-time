@@ -25,6 +25,7 @@ static const char* morse_digits[] = {
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
+static TextLayer *s_debug_layer;
 
 static AppTimer *s_timeout_timer;
 
@@ -45,11 +46,21 @@ static void queue_vibration_for_digit(int digit, uint32_t *segment_index) {
     }
 }
 
+static void log_to_screen(const char *msg) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", msg);
+  if (s_debug_layer) {
+    text_layer_set_text(s_debug_layer, msg);
+  }
+}
+
 static void timeout_callback(void *data) {
+  log_to_screen("Timeout reached!");
+  s_timeout_timer = NULL;
   window_stack_pop_all(true);
 }
 
 static void reset_timeout_timer() {
+  log_to_screen("Timer Reset");
   if (s_timeout_timer) {
     app_timer_cancel(s_timeout_timer);
   }
@@ -98,7 +109,7 @@ static void trigger_morse_time_vibration() {
     vibe_pattern.durations = vibe_segments;
     vibe_pattern.num_segments = segment_index;
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Vibrating time in Morse code.");
+    log_to_screen("Vibrating...");
     static char s_pattern_buffer[512];
     int offset = snprintf(s_pattern_buffer, sizeof(s_pattern_buffer), "Pattern: ");
     for(uint32_t i = 0; i < vibe_pattern.num_segments; i++) {
@@ -169,11 +180,21 @@ static void main_window_load(Window *window) {
 
   // Add it as a child layer to the Window's root layer
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+
+  // Create Debug Layer
+  s_debug_layer = text_layer_create(GRect(0, bounds.size.h - 30, bounds.size.w, 30));
+  text_layer_set_background_color(s_debug_layer, GColorBlack);
+  text_layer_set_text_color(s_debug_layer, GColorWhite);
+  text_layer_set_font(s_debug_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_text_alignment(s_debug_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_debug_layer, "Debug Ready v1.4");
+  layer_add_child(window_layer, text_layer_get_layer(s_debug_layer));
 }
 
 static void main_window_unload(Window *window) {
   // Destroy TextLayer
   text_layer_destroy(s_time_layer);
+  text_layer_destroy(s_debug_layer);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {

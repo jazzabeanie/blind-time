@@ -15,6 +15,7 @@ jobs:
         run: |
           docker run --rm -v ${{ github.workspace }}:/pebble -w /pebble rebble/pebble-sdk:latest pebble build
           sudo chown -R $USER build
+          [ -f build/pebble.pbw ] && mv build/pebble.pbw build/blind-time.pbw || true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
