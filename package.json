@@ -23,13 +23,13 @@
     "watchapp": {
       "watchface": false
     },
-    "messageKeys": {
-      "MORSE_DOT_DURATION": 1,
-      "MORSE_DASH_DURATION": 2,
-      "MORSE_GAP_DURATION": 3,
-      "MORSE_DIGIT_GAP_DURATION": 4,
-      "TIMEOUT_MS": 5
-    },
+    "messageKeys": [
+      "MORSE_DOT_DURATION",
+      "MORSE_DASH_DURATION",
+      "MORSE_GAP_DURATION",
+      "MORSE_DIGIT_GAP_DURATION",
+      "TIMEOUT_MS"
+    ],
     "resources": {
       "media": []
     }
