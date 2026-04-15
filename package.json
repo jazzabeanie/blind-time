@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-clay": "^1.0.3"
+  },
   "pebble": {
     "displayName": "blind-time",
     "uuid": "0d7a13a3-e42f-40da-bed3-1aa78931eff3",
@@ -21,9 +23,13 @@
     "watchapp": {
       "watchface": false
     },
-    "messageKeys": [
-      "dummy"
-    ],
+    "messageKeys": {
+      "MORSE_DOT_DURATION": 1,
+      "MORSE_DASH_DURATION": 2,
+      "MORSE_GAP_DURATION": 3,
+      "MORSE_DIGIT_GAP_DURATION": 4,
+      "TIMEOUT_MS": 5
+    },
     "resources": {
       "media": []
     }

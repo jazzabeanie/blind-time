@@ -1,0 +1,73 @@
+[
+  {
+    "type": "heading",
+    "defaultValue": "Blind-Time Settings"
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Morse Durations (ms)"
+      },
+      {
+        "type": "slider",
+        "messageKey": "MORSE_DOT_DURATION",
+        "defaultValue": 100,
+        "label": "Dot Duration",
+        "min": 50,
+        "max": 500,
+        "step": 10
+      },
+      {
+        "type": "slider",
+        "messageKey": "MORSE_DASH_DURATION",
+        "defaultValue": 300,
+        "label": "Dash Duration",
+        "min": 100,
+        "max": 1000,
+        "step": 20
+      },
+      {
+        "type": "slider",
+        "messageKey": "MORSE_GAP_DURATION",
+        "defaultValue": 150,
+        "label": "Gap between symbols",
+        "min": 50,
+        "max": 500,
+        "step": 10
+      },
+      {
+        "type": "slider",
+        "messageKey": "MORSE_DIGIT_GAP_DURATION",
+        "defaultValue": 1000,
+        "label": "Gap between digits",
+        "min": 500,
+        "max": 3000,
+        "step": 100
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "App Settings"
+      },
+      {
+        "type": "slider",
+        "messageKey": "TIMEOUT_MS",
+        "defaultValue": 30000,
+        "label": "Inactivity Timeout (ms)",
+        "min": 5000,
+        "max": 60000,
+        "step": 1000
+      }
+    ]
+  },
+  {
+    "type": "submit",
+    "defaultValue": "Save Settings"
+  }
+]
