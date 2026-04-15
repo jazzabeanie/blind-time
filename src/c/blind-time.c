@@ -1,6 +1,6 @@
 #include <pebble.h>
 #include <string.h>
-#include "message_keys.g.h"
+#include "message_keys.auto.h"
 
 // Morse definitions
 static int s_morse_dot_duration = 100;
