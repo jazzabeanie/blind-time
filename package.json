@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-clay": "^1.0.3"
+  },
   "pebble": {
     "displayName": "blind-time",
     "uuid": "0d7a13a3-e42f-40da-bed3-1aa78931eff3",
@@ -22,7 +24,11 @@
       "watchface": false
     },
     "messageKeys": [
-      "dummy"
+      "MORSE_DOT_DURATION",
+      "MORSE_DASH_DURATION",
+      "MORSE_GAP_DURATION",
+      "MORSE_DIGIT_GAP_DURATION",
+      "TIMEOUT_MS"
     ],
     "resources": {
       "media": []

@@ -1,13 +1,14 @@
 #include <pebble.h>
 #include <string.h>
+#include "message_keys.auto.h"
 
 // Morse definitions
-#define MORSE_DOT_DURATION 100
-#define MORSE_DASH_DURATION 300
-#define MORSE_GAP_DURATION 150
-#define MORSE_DIGIT_GAP_DURATION 1000
+static int s_morse_dot_duration = 100;
+static int s_morse_dash_duration = 300;
+static int s_morse_gap_duration = 150;
+static int s_morse_digit_gap_duration = 1000;
 
-#define TIMEOUT_MS 30000
+static int s_timeout_ms = 30000;
 
 // Morse patterns for 0-9
 static const char* morse_digits[] = {
@@ -38,19 +39,21 @@ static void queue_vibration_for_digit(int digit, uint32_t *segment_index) {
         if (*segment_index >= 62) return; // Prevent overflow
 
         if (morse_pattern[i] == '.') {
-            vibe_segments[(*segment_index)++] = MORSE_DOT_DURATION;
+            vibe_segments[(*segment_index)++] = s_morse_dot_duration;
         } else {
-            vibe_segments[(*segment_index)++] = MORSE_DASH_DURATION;
+            vibe_segments[(*segment_index)++] = s_morse_dash_duration;
         }
-        vibe_segments[(*segment_index)++] = MORSE_GAP_DURATION;
+        vibe_segments[(*segment_index)++] = s_morse_gap_duration;
     }
 }
 
 static void log_to_screen(const char *msg) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", msg);
+  /*
   if (s_debug_layer) {
     text_layer_set_text(s_debug_layer, msg);
   }
+  */
 }
 
 static void timeout_callback(void *data) {
@@ -64,7 +67,39 @@ static void reset_timeout_timer() {
   if (s_timeout_timer) {
     app_timer_cancel(s_timeout_timer);
   }
-  s_timeout_timer = app_timer_register(TIMEOUT_MS, timeout_callback, NULL);
+  s_timeout_timer = app_timer_register(s_timeout_ms, timeout_callback, NULL);
+}
+
+static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
+  Tuple *dot_duration_t = dict_find(iter, MESSAGE_KEY_MORSE_DOT_DURATION);
+  if (dot_duration_t) {
+    s_morse_dot_duration = dot_duration_t->value->int32;
+    persist_write_int(MESSAGE_KEY_MORSE_DOT_DURATION, s_morse_dot_duration);
+  }
+
+  Tuple *dash_duration_t = dict_find(iter, MESSAGE_KEY_MORSE_DASH_DURATION);
+  if (dash_duration_t) {
+    s_morse_dash_duration = dash_duration_t->value->int32;
+    persist_write_int(MESSAGE_KEY_MORSE_DASH_DURATION, s_morse_dash_duration);
+  }
+
+  Tuple *gap_duration_t = dict_find(iter, MESSAGE_KEY_MORSE_GAP_DURATION);
+  if (gap_duration_t) {
+    s_morse_gap_duration = gap_duration_t->value->int32;
+    persist_write_int(MESSAGE_KEY_MORSE_GAP_DURATION, s_morse_gap_duration);
+  }
+
+  Tuple *digit_gap_duration_t = dict_find(iter, MESSAGE_KEY_MORSE_DIGIT_GAP_DURATION);
+  if (digit_gap_duration_t) {
+    s_morse_digit_gap_duration = digit_gap_duration_t->value->int32;
+    persist_write_int(MESSAGE_KEY_MORSE_DIGIT_GAP_DURATION, s_morse_digit_gap_duration);
+  }
+
+  Tuple *timeout_ms_t = dict_find(iter, MESSAGE_KEY_TIMEOUT_MS);
+  if (timeout_ms_t) {
+    s_timeout_ms = timeout_ms_t->value->int32;
+    persist_write_int(MESSAGE_KEY_TIMEOUT_MS, s_timeout_ms);
+  }
 }
 
 static void trigger_morse_time_vibration() {
@@ -87,20 +122,20 @@ static void trigger_morse_time_vibration() {
     if (hour >= 10) {
         queue_vibration_for_digit(hour / 10, &segment_index);
         if (segment_index > 0) {
-            vibe_segments[segment_index - 1] = MORSE_DIGIT_GAP_DURATION;
+            vibe_segments[segment_index - 1] = s_morse_digit_gap_duration;
         }
     }
 
     // Hour - second digit
     queue_vibration_for_digit(hour % 10, &segment_index);
     if (segment_index > 0) {
-        vibe_segments[segment_index - 1] = MORSE_DIGIT_GAP_DURATION;
+        vibe_segments[segment_index - 1] = s_morse_digit_gap_duration;
     }
 
     // Minute - first digit
     queue_vibration_for_digit(minute / 10, &segment_index);
     if (segment_index > 0) {
-        vibe_segments[segment_index - 1] = MORSE_DIGIT_GAP_DURATION;
+        vibe_segments[segment_index - 1] = s_morse_digit_gap_duration;
     }
 
     // Minute - second digit
@@ -182,6 +217,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 
   // Create Debug Layer
+  /*
   s_debug_layer = text_layer_create(GRect(0, bounds.size.h - 30, bounds.size.w, 30));
   text_layer_set_background_color(s_debug_layer, GColorBlack);
   text_layer_set_text_color(s_debug_layer, GColorWhite);
@@ -189,12 +225,15 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_debug_layer, GTextAlignmentCenter);
   text_layer_set_text(s_debug_layer, "Debug Ready v1.4");
   layer_add_child(window_layer, text_layer_get_layer(s_debug_layer));
+  */
 }
 
 static void main_window_unload(Window *window) {
   // Destroy TextLayer
   text_layer_destroy(s_time_layer);
+  /*
   text_layer_destroy(s_debug_layer);
+  */
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -202,6 +241,25 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void init() {
+  if (persist_exists(MESSAGE_KEY_MORSE_DOT_DURATION)) {
+    s_morse_dot_duration = persist_read_int(MESSAGE_KEY_MORSE_DOT_DURATION);
+  }
+  if (persist_exists(MESSAGE_KEY_MORSE_DASH_DURATION)) {
+    s_morse_dash_duration = persist_read_int(MESSAGE_KEY_MORSE_DASH_DURATION);
+  }
+  if (persist_exists(MESSAGE_KEY_MORSE_GAP_DURATION)) {
+    s_morse_gap_duration = persist_read_int(MESSAGE_KEY_MORSE_GAP_DURATION);
+  }
+  if (persist_exists(MESSAGE_KEY_MORSE_DIGIT_GAP_DURATION)) {
+    s_morse_digit_gap_duration = persist_read_int(MESSAGE_KEY_MORSE_DIGIT_GAP_DURATION);
+  }
+  if (persist_exists(MESSAGE_KEY_TIMEOUT_MS)) {
+    s_timeout_ms = persist_read_int(MESSAGE_KEY_TIMEOUT_MS);
+  }
+
+  app_message_register_inbox_received(prv_inbox_received_handler);
+  app_message_open(128, 128);
+
   // Create main Window element and assign to pointer
   s_main_window = window_create();
 
